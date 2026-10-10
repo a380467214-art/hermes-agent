@@ -489,6 +489,7 @@ def test_zip_swap_lock_is_one_inode_across_a_release(tmp_path):
     assert a["inode"] == b["inode"] == c["inode"]
 
 
+@pytest.mark.platforms("posix")  # POSIX permission bits; root ignores them
 @pytest.mark.skipif(os.name == "nt" or (hasattr(os, "geteuid") and os.geteuid() == 0),
                     reason="POSIX permission bits; root ignores them")
 def test_zip_swap_lock_refuses_admission_without_a_lock(tmp_path):
@@ -530,10 +531,14 @@ def _unreadable_release(tmp_path: Path, *, read_only_dir: bool) -> tuple[Path, P
     return live, extracted, locked
 
 
+# The host half of this gate is a ``platforms("posix")`` marker on each test that carries this
+# alias (a marker is what puts the file on the macOS lane's import list); the alias keeps only the
+# root half, which cannot move into a marker because ``os.geteuid`` is absent on Windows.
 _POSIX_MODES = pytest.mark.skipif(os.name == "nt" or (hasattr(os, "geteuid") and os.geteuid() == 0),
                                   reason="POSIX permission bits; root ignores them")
 
 
+@pytest.mark.platforms("posix")  # POSIX permission bits; root ignores them
 @_POSIX_MODES
 def test_unreadable_source_file_leaves_no_partial_stage(tmp_path):
     """The copy of ``second`` dies on an unreadable file after copying the rest: that partial staging
@@ -553,6 +558,7 @@ def test_unreadable_source_file_leaves_no_partial_stage(tmp_path):
     assert sorted(p.name for p in live.iterdir()) == [".hermes-update-zip-swap.lock", "keep.txt"]
 
 
+@pytest.mark.platforms("posix")  # POSIX permission bits; root ignores them
 @_POSIX_MODES
 def test_a_stage_cleanup_that_cannot_finish_keeps_the_journal_for_recovery(tmp_path):
     """When the updater cannot remove its partial stage, the journal is that stage's only record: it
@@ -583,6 +589,7 @@ def _swap_or_recover(extracted: Path, entries: list[str], live: Path) -> None:
         restore_interrupted_zip_swap(live)
 
 
+@pytest.mark.platforms("posix")  # POSIX permission bits; root ignores them
 @_POSIX_MODES
 def test_a_stale_backup_never_stands_in_for_the_live_entry(tmp_path, monkeypatch):
     """A leftover ``<entry>.hermes-update-old`` this swap did not make (a pre-journal crash holding a
@@ -850,6 +857,7 @@ def _git_checkout(root: Path, files: dict[str, str]) -> None:
         subprocess.run(["git", *args], cwd=root, check=True, capture_output=True)
 
 
+@pytest.mark.platforms("posix")  # POSIX permission bits; root ignores them
 @_POSIX_MODES
 def test_a_committed_swap_keeps_its_journal_until_the_backup_is_gone(tmp_path, monkeypatch):
     """Q1/F79: the swap committed but its backup could not be removed (a read-only directory in the old

@@ -563,7 +563,7 @@ def test_a_reader_git_in_the_tree_is_not_an_index_lock_holder_and_a_holder_is_na
         holder.wait()
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX shell stubs stand in for a decayed git")
+@pytest.mark.platforms("posix")  # POSIX shell stubs stand in for a decayed git
 @pytest.mark.parametrize("stub", ["#!/bin/sh\nexit 0\n", "not a program\n"], ids=["silent-exit-0", "not-executable"])
 def test_a_recorded_git_that_is_no_longer_git_falls_back_and_still_repairs(tmp_path, stub):
     """m5: the marker's recorded ``git=`` was trusted on ``os.path.isfile`` alone. A stub that exits 0

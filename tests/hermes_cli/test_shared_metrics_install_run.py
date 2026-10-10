@@ -136,7 +136,7 @@ def test_start_with_collection_off_purges_receipts_unreported(marks, monkeypatch
     assert marks.rows == []
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="runs the real install.sh")
+@pytest.mark.platforms("posix")  # runs the real install.sh
 def test_real_install_sh_ladder_leaves_only_closed_tokens(tmp_path):
     """The real ladder with git missing from PATH fails in prerequisites and parks one closed receipt."""
     tools = tmp_path / "bin"
@@ -316,7 +316,7 @@ def _ctrl_c_ladder(tmp_path: Path, child_exit: int) -> tuple[int, str, list[dict
     return proc.returncode, out.decode("utf-8", "replace"), receipts
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="runs the real install.sh")
+@pytest.mark.platforms("posix")  # runs the real install.sh
 def test_a_ctrl_c_the_stage_handles_lets_the_install_finish(tmp_path):
     """The receipt's signal traps must never change the installer's control flow: before them, bash's
     cooperative exit let the ladder carry on when the child caught Ctrl-C and succeeded."""
@@ -327,7 +327,7 @@ def test_a_ctrl_c_the_stage_handles_lets_the_install_finish(tmp_path):
     assert [(r["outcome"], r["failed_stage"], r["failure_class"]) for r in receipts] == [("success", "none", "none")]
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="runs the real install.sh")
+@pytest.mark.platforms("posix")  # runs the real install.sh
 def test_a_user_abort_the_child_turns_into_exit_1_is_recorded_as_interrupted(tmp_path):
     """pm.cli / source_completion / `hermes setup` catch KeyboardInterrupt and exit 1, which reaches the
     stage's `|| fail ... deps_install_failed`; the receipt must still say the user stopped it."""

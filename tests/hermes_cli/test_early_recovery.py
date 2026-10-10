@@ -289,6 +289,7 @@ def test_an_unparsed_zip_journal_keeps_itself_and_every_backup(tmp_path, monkeyp
         "a.py": "NEW_A", "a.py.hermes-update-old": "OLD_A", "b.py": "OLD_B", "b.py.hermes-update-staging": "NEW_B"}
 
 
+@pytest.mark.platforms("posix")  # POSIX modes; root ignores them
 @pytest.mark.skipif(sys.platform == "win32" or getattr(os, "geteuid", lambda: 0)() == 0,
                     reason="POSIX modes; root ignores them")
 def test_dropping_a_staged_tree_never_changes_a_hardlinked_live_files_mode(tmp_path):

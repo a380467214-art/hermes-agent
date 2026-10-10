@@ -178,6 +178,7 @@ def test_a_lock_refusal_of_the_hand_offs_own_update_child_is_a_failed_run(rows, 
     assert all(contract.counter_dimensions_are_valid(contract.UPDATE_RUN_METRIC, r) for r in rows.runs())
 
 
+@pytest.mark.platforms("posix")  # needs POSIX permissions as non-root
 @pytest.mark.skipif(sys.platform == "win32" or os.geteuid() == 0, reason="POSIX permissions; root ignores them")
 def test_a_checkout_move_names_a_held_index_lock_apart_from_a_permission_error(rows, tmp_path, monkeypatch):
     """Invariant: the fast-forward's git error goes through the shared classifier: an index.lock that
