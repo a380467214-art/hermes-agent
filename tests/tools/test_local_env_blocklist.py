@@ -176,6 +176,7 @@ def test_user_platform_plugin_secrets_belong_to_their_own_profile(child_env, mon
         reset_hermes_home_override(token)
 
 
+@pytest.mark.platforms("posix")  # needs POSIX permissions as non-root
 @pytest.mark.skipif(os.name == "nt" or os.geteuid() == 0,  # windows-footgun: ok — short-circuits on nt
                     reason="needs POSIX permissions as non-root")
 @pytest.mark.parametrize("layout", ["platforms", "flat"])
@@ -263,6 +264,7 @@ def test_a_symlinked_home_alias_shares_its_profiles_plugin_declarations(child_en
     assert sizes[0] == sizes[1]
 
 
+@pytest.mark.platforms("posix")  # needs POSIX permissions as non-root
 @pytest.mark.skipif(os.name == "nt" or os.geteuid() == 0,  # windows-footgun: ok — short-circuits on nt
                     reason="needs POSIX permissions as non-root")
 def test_unreadable_platform_manifest_fails_closed(tmp_path):

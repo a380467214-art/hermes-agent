@@ -148,7 +148,7 @@ def test_register_self_survives_non_utf8_argv(tmp_path):
     assert me["argv"] == " ".join(bad_argv)
 
 
-@pytest.mark.skipif(os.name == "nt", reason="POSIX mode bits are platform-specific")
+@pytest.mark.platforms("posix")  # POSIX mode bits are platform-specific
 def test_register_self_writes_ledger_with_0600(tmp_path):
     ledger = tmp_path / "spawn-ledger.json"
     fake = _fake_psutil({999: 50.0})

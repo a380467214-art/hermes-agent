@@ -470,7 +470,7 @@ def test_pty_reader_loop_reassembles_multibyte_char_split_across_chunks(registry
 # Orphaned-pipe reconciliation (issue #17327)
 # =========================================================================
 
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX-only: uses setsid/fcntl")
+@pytest.mark.platforms("posix")  # POSIX-only: uses setsid/fcntl
 class TestOrphanedPipeReconciliation:
     """Regression tests for issue #17327.
 
@@ -1653,7 +1653,7 @@ class TestTerminateHostPidPosix:
             "Parent must receive SIGTERM before any snapshot descendant"
         )
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX signal ordering; Windows uses taskkill")
+    @pytest.mark.platforms("posix")  # POSIX signal ordering; Windows uses taskkill
     @pytest.mark.live_system_guard_bypass
     def test_posix_self_reaping_supervisor_child_is_never_signalled_by_registry(self, monkeypatch, tmp_path):
         """A parent that tears down its own children on SIGTERM keeps that job.
@@ -1755,8 +1755,7 @@ class TestPidReuseGuard:
         assert s.id in registry._finished
 
 
-@pytest.mark.skipif(sys.platform == "win32",
-                    reason="POSIX SIGTERM→SIGKILL escalation; Windows uses taskkill /F")
+@pytest.mark.platforms("posix")  # POSIX SIGTERM→SIGKILL escalation; Windows uses taskkill /F
 class TestSigkillEscalation:
     """Bounded SIGTERM→SIGKILL escalation in _terminate_host_pid.
 
@@ -2021,7 +2020,7 @@ class TestHandleProcessTransformHook:
 # Reader loop: orphaned grandchild holding the stdout pipe (issue #68915)
 # =========================================================================
 
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX-only: select() on pipes")
+@pytest.mark.platforms("posix")  # POSIX-only: select() on pipes
 class TestReaderLoopOrphanedPipe:
     """Regression tests for issue #68915.
 
@@ -2122,7 +2121,7 @@ class TestReaderLoopOrphanedPipe:
 # =========================================================================
 # systemd cgroup isolation for gateway-spawned local executors (#70716)
 # =========================================================================
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX-only: systemd scopes")
+@pytest.mark.platforms("linux")  # systemd scopes; the systemd-run probe is Linux-only
 class TestSystemdCgroupIsolation:
     """Verify spawn_local wraps the worker in ``systemd-run --user --scope``
     when running under a supervisor and systemd-run is available, and falls
@@ -2159,7 +2158,6 @@ class TestSystemdCgroupIsolation:
 
         return fake_popen, captured
 
-    @pytest.mark.platforms("linux")
     def test_wraps_in_systemd_scope_when_supervisor_and_available(
         self, registry, monkeypatch, _gateway_identity
     ):
@@ -2377,7 +2375,6 @@ class TestSystemdCgroupIsolation:
 
         assert session.systemd_unit == ""
 
-    @pytest.mark.platforms("linux")
     def test_systemd_post_spawn_failure_never_kills_gateway_process_group(
         self, registry, monkeypatch, _gateway_identity
     ):
@@ -2412,7 +2409,6 @@ class TestSystemdCgroupIsolation:
         assert stop_unit.call_args.args[0].endswith(".scope")
         killpg.assert_not_called()
 
-    @pytest.mark.platforms("linux")
     def test_pty_spawn_is_wrapped_in_systemd_scope(self, registry, monkeypatch, _gateway_identity):
         """Interactive executors receive the same sibling-cgroup isolation."""
         from ptyprocess import PtyProcess
@@ -2444,7 +2440,6 @@ class TestSystemdCgroupIsolation:
         assert argv[-3:] == ["/bin/bash", "-lic", "set +m; codex"]
         assert session.systemd_unit == f"hermes-worker-{session.id}.scope"
 
-    @pytest.mark.platforms("linux")
     def test_pty_spawn_failure_reaps_scope_before_distinct_pipe_fallback(
         self, registry, monkeypatch, _gateway_identity
     ):
@@ -2500,7 +2495,6 @@ class TestSystemdCgroupIsolation:
             f"hermes-worker-{session.id}-pipe-fallback.scope"
         )
 
-    @pytest.mark.platforms("linux")
     def test_pty_spawn_failure_does_not_fallback_when_scope_reap_fails(
         self, registry, monkeypatch, _gateway_identity
     ):
@@ -2593,7 +2587,6 @@ class TestSystemdCgroupIsolation:
         assert session.id in registry._finished
         assert session.id not in registry._running
 
-    @pytest.mark.platforms("linux")
     def test_systemd_run_user_scope_available_caches_after_probe(
         self, registry, monkeypatch
     ):
@@ -2624,7 +2617,6 @@ class TestSystemdCgroupIsolation:
             value.startswith("OOMPolicy=") for value in probe_argv if isinstance(value, str)
         ), probe_argv
 
-    @pytest.mark.platforms("linux")
     @pytest.mark.parametrize("rejects_no_expand", [False, True], ids=["systemd>=254", "systemd<254"])
     def test_scoped_command_is_not_expanded_by_systemd_run(self, monkeypatch, rejects_no_expand):
         """systemd >= 254 rewrites ``$$``/``${X}`` in a --scope command unless given
@@ -2652,7 +2644,6 @@ class TestSystemdCgroupIsolation:
         assert spawn[spawn.index("--") + 1:] == ["bash", "-c", "echo $$"]
         assert len(probes) == (2 if rejects_no_expand else 1)
 
-    @pytest.mark.platforms("linux")
     def test_successful_systemd_probe_revalidates_after_cache_ttl(self, monkeypatch):
         """A vanished user bus invalidates a formerly successful scope verdict."""
         import tools.process_registry as pr
@@ -2678,7 +2669,6 @@ class TestSystemdCgroupIsolation:
         assert pr._systemd_run_user_scope_available() is False
         assert len(probe_calls) == 2
 
-    @pytest.mark.platforms("linux")
     def test_systemd_probe_derives_owned_user_bus_env_for_system_gateway(
         self, registry, monkeypatch, request
     ):
@@ -2727,7 +2717,6 @@ class TestSystemdCgroupIsolation:
         assert "XDG_RUNTIME_DIR" not in os.environ
         assert "DBUS_SESSION_BUS_ADDRESS" not in os.environ
 
-    @pytest.mark.platforms("linux")
     def test_scoped_spawn_lost_user_bus_honours_configured_runtime_dir(self, monkeypatch, request):
         """The lost-bus check must derive from the env the worker was spawned with: when the bus
         lives under a configured ``XDG_RUNTIME_DIR`` (not ``/run/user/<uid>``), an unrelated wrapper
@@ -2765,7 +2754,6 @@ class TestSystemdCgroupIsolation:
         assert pr.scoped_spawn_lost_user_bus(spawn_env) is True
         assert pr._SYSTEMD_SCOPE_AVAILABLE is False
 
-    @pytest.mark.platforms("linux")
     def test_probe_succeeds_without_bin_true(self, monkeypatch):
         """An absent ``/bin/true`` must not make a usable scope fail its probe."""
         import tools.process_registry as pr
@@ -2789,7 +2777,6 @@ class TestSystemdCgroupIsolation:
         assert pr._systemd_run_user_scope_available() is True
         assert len(executed) == 1, "payload must really run (exit 0) on the host, not just be spelled right"
 
-    @pytest.mark.platforms("linux")
     def test_systemd_scope_first_probe_is_serialized(self, monkeypatch):
         """Concurrent first-use callers must wait for one definitive probe.
 
@@ -2837,7 +2824,6 @@ class TestSystemdCgroupIsolation:
         assert results == [True, True]
         assert len(probe_calls) == 1
 
-    @pytest.mark.platforms("linux")
     def test_failed_systemd_probe_retries_after_cache_ttl(self, monkeypatch):
         import tools.process_registry as pr
 

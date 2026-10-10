@@ -23,7 +23,6 @@ import os
 import re
 import signal
 import subprocess
-import sys
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Iterator
@@ -37,7 +36,7 @@ from tests.fakes.fake_llm_provider import Error, FakeLLMServer, Response, Text
 # The gateway child is isolated (scratch HOME/HERMES_HOME, own lock dir) and reaped by PID below.
 pytestmark = [
     pytest.mark.spawns_gateway_lookalike,
-    pytest.mark.skipif(sys.platform == "win32", reason="POSIX process groups for the gateway child"),
+    pytest.mark.platforms("posix"),  # POSIX process groups for the gateway child
 ]
 
 _REBILLED = r"doomed card billed \d+ aux decompose calls over >= \d+ dispatcher ticks \(bound \d+\)"

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 from datetime import datetime, timedelta, timezone, UTC
 from pathlib import Path
 
@@ -18,7 +17,7 @@ import pytest
 from hermes_cli import update_pause_record as pause_record
 
 pytestmark = [
-    pytest.mark.skipif(sys.platform == "win32", reason="POSIX modes stand in for Windows refusals"),
+    pytest.mark.platforms("posix"),  # POSIX modes stand in for Windows refusals
     pytest.mark.skipif(hasattr(os, "geteuid") and os.geteuid() == 0, reason="root ignores file modes"),
 ]
 

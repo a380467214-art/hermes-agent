@@ -55,7 +55,7 @@ def test_lock_timeout_without_a_holder_stays_silent_about_one(tmp_path, monkeypa
     assert "another hermes process" not in message  # no holder detected: no one to blame
 
 
-@pytest.mark.skipif(os.name != "posix", reason="holder liveness probe is POSIX-only (os.kill sig 0)")
+@pytest.mark.platforms("posix")  # holder liveness probe is POSIX-only (os.kill sig 0)
 def test_lock_timeout_ignores_a_stale_pid_from_a_dead_holder(tmp_path, monkeypatch):
     from hermes_cli import auth
 

@@ -14,7 +14,6 @@ import json
 import os
 import shutil
 import socket
-import sys
 import tempfile
 import threading
 import time
@@ -38,11 +37,7 @@ from gateway.shutdown_watchdog import (
 # skipped: the witness-absent contracts (mocked probes, file-only
 # heartbeats) are platform-independent and keep running on Windows, per
 # the Windows behavior pinned alongside the product-side guarantee.
-_NEEDS_UNIX_SOCKETS = pytest.mark.skipif(
-    sys.platform == "win32",
-    reason="requires real UNIX-domain sockets "
-    "(socket.AF_UNIX / asyncio.start_unix_server), unavailable on native Windows",
-)
+_NEEDS_UNIX_SOCKETS = pytest.mark.platforms("posix")  # requires real UNIX-domain sockets (socket.AF_UNIX / asyncio.start_unix_server), unavailable on native Windows
 
 @pytest.fixture()
 def tmp_path():

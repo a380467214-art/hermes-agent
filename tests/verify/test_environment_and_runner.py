@@ -2,7 +2,6 @@
 
 import http.server
 import json
-import os
 import subprocess
 import threading
 import time
@@ -264,7 +263,7 @@ class TestReadiness:
             thread.join(timeout=5)
 
 
-@pytest.mark.skipif(os.name != "posix", reason="POSIX process-group semantics")
+@pytest.mark.platforms("posix")  # POSIX process-group semantics
 class TestTerminateProcessGroupGuard:
     """_terminate_process_group must never killpg a group the child does not
     lead: a child spawned without start_new_session shares OUR process group,

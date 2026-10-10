@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
@@ -143,7 +142,7 @@ class TestFindStaleDashboardPids:
 
 
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="ps-based scan path")
+    @pytest.mark.platforms("posix")  # ps-based scan path
     def test_self_pid_excluded(self):
         with patch("subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
@@ -175,7 +174,7 @@ class TestFindStaleDashboardPids:
 
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX kill semantics")
+@pytest.mark.platforms("posix")  # POSIX kill semantics
 class TestKillStaleDashboardPosix:
     """Kill path on Linux / macOS: SIGTERM then SIGKILL any survivors."""
 
@@ -302,7 +301,7 @@ class TestDashboardUpdateCleanup:
 
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX kill + systemd restart")
+@pytest.mark.platforms("posix")  # POSIX kill + systemd restart
 class TestSupervisedBackendRestart:
     """After the kill, systemd-supervised PIDs get their owning unit
     restarted (#68934) — SIGTERM reads as a clean stop to systemd, so
@@ -410,7 +409,7 @@ class TestManualBackendRespawn:
         return main_dashboard
 
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX cmdline capture + respawn")
+    @pytest.mark.platforms("posix")  # POSIX cmdline capture + respawn
     def test_argv_capture_failure_falls_back_to_hint(self, capsys):
         live = self._live()
 
@@ -431,7 +430,7 @@ class TestManualBackendRespawn:
         respawn.assert_not_called()
         assert result["unrecovered"] == [5555]
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX cmdline capture + respawn")
+    @pytest.mark.platforms("posix")  # POSIX cmdline capture + respawn
     def test_non_orphan_fixed_port_still_respawns(self, capsys):
         """A supervised-by-shell dashboard with a fixed port is still restarted."""
         live = self._live()
@@ -455,7 +454,7 @@ class TestManualBackendRespawn:
         respawn.assert_called_once_with([argv])
         assert "when you're ready" not in capsys.readouterr().out
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX cmdline capture + respawn")
+    @pytest.mark.platforms("posix")  # POSIX cmdline capture + respawn
     def test_port_zero_serves_killed_without_respawn(self, capsys):
         """``serve --port 0`` backends are stopped but not resurrected (#78821)."""
         live = self._live()
@@ -778,7 +777,7 @@ class TestCmdlineCapture:
     def _live(self):
         return main_dashboard
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX /proc cmdline path")
+    @pytest.mark.platforms("posix")  # POSIX /proc cmdline path
     def test_reads_proc_cmdline_when_available(self, tmp_path, monkeypatch):
         live = self._live()
         proc_file = tmp_path / "cmdline"
@@ -804,7 +803,7 @@ class TestCmdlineCapture:
 
         assert argv == ["/usr/bin/python3", "-m", "hermes_cli.main", "serve"]
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX ps cmdline fallback")
+    @pytest.mark.platforms("posix")  # POSIX ps cmdline fallback
     def test_falls_back_to_ps_without_proc(self, monkeypatch):
         live = self._live()
 
@@ -888,7 +887,7 @@ class TestLaunchdSupervisedBackends:
             result = _kill_stale_dashboard_processes(restart_managed=restart_managed)
         return result, restart, respawn
 
-    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX cmdline capture + respawn")
+    @pytest.mark.platforms("posix")  # POSIX cmdline capture + respawn
     def test_launchd_owned_backend_restarts_through_launchd_never_as_a_detached_respawn(self, capsys):
         """The reporter's state: the job is loaded but has no live process (it keeps failing on the
         port) and a detached copy runs its exact ProgramArguments. The copy is stopped and the JOB

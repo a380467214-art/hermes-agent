@@ -910,9 +910,7 @@ def test_run_quiet_swallows_missing_binary(tmp_path):
 
 
 
-@pytest.mark.skipif(
-    sys.platform == "win32", reason="Symlinks require elevated privileges on Windows"
-)
+@pytest.mark.platforms("posix")  # Symlinks require elevated privileges on Windows
 def test_running_interpreter_keeps_venv_semantic_path(tmp_path, monkeypatch):
     """Lexical preserved only when pyvenv.cfg marks the path as a venv."""
     # venv layout: bin/python symlink -> base, pyvenv.cfg at venv root
@@ -1010,9 +1008,7 @@ def test_wrapper_ownership_rejects_sibling_extensions(suffix, tmp_path):
     assert lde._wrapper_targets_checkout(evil, checkout) is False
 
 
-@pytest.mark.skipif(
-    sys.platform == "win32", reason="Symlinks require elevated privileges on Windows"
-)
+@pytest.mark.platforms("posix")  # Symlinks require elevated privileges on Windows
 def test_wrapper_ownership_accepts_shim_via_symlinked_home(tmp_path, monkeypatch):
     """Installer writes $INSTALL_DIR lexically; the root stays lexical too.
 

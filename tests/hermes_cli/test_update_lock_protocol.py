@@ -22,7 +22,7 @@ import pytest
 from hermes_cli.update_lock import UpdateLock, marker_mutex_path, process_create_time
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-posix_only = pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals / fd inheritance")
+posix_only = pytest.mark.platforms("posix")  # POSIX signals / fd inheritance
 
 
 def _script(tmp_path: Path, code: str) -> Path:

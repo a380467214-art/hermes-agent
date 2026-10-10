@@ -17,7 +17,7 @@ from hermes_cli import update_pause_record as pause_record
 from datetime import UTC
 
 REPO = Path(__file__).resolve().parents[2]
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals; Windows cells live in wine2e")
+pytestmark = pytest.mark.platforms("posix")  # POSIX signals; Windows cells live in wine2e
 
 
 # Every child (and its children) locks a private file for THIS repo's checkout, like the

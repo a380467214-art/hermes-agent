@@ -24,7 +24,7 @@ import pytest
 
 from hermes_cli import dashboard_procs
 
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="POSIX signal semantics only")
+pytestmark = pytest.mark.platforms("posix")  # POSIX signal semantics only
 
 _IGNORING_CHILD = textwrap.dedent(
     """

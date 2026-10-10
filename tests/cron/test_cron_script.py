@@ -589,10 +589,7 @@ class TestScriptPathContainment:
         assert output == "sub ok"
 
 
-    @pytest.mark.skipif(
-        sys.platform == "win32",
-        reason="Symlinks require elevated privileges on Windows",
-    )
+    @pytest.mark.platforms("posix")  # Symlinks require elevated privileges on Windows
     def test_symlink_escape_blocked(self, cron_env, tmp_path):
         """Symlinks pointing outside scripts/ must be rejected."""
         from cron.scheduler_script import _run_job_script

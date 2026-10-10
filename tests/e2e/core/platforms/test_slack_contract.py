@@ -9,7 +9,6 @@ pattern, reason); see ``_suite.py``: xfail only on that message, pass once the f
 
 from __future__ import annotations
 
-import sys
 
 import pytest
 
@@ -18,7 +17,7 @@ from tests.e2e.core.platforms._suite import rig_fixtures, run_scenario, scenario
 
 pytestmark = [
     pytest.mark.spawns_gateway_lookalike,
-    pytest.mark.skipif(sys.platform == "win32", reason="POSIX process-group gateway harness"),
+    pytest.mark.platforms("posix"),  # POSIX process-group gateway harness
 ]
 
 _MIDWORD = (r"the continuation after a rejected finalize resumed mid-word",

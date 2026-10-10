@@ -9,13 +9,12 @@ claim, the hand-back and the backoff are the real ones, on real files.
 from __future__ import annotations
 
 import json
-import sys
 
 import pytest
 
 from hermes_cli import update_pause_record as pause_record
 
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="the stand-in replaces the native resume")
+pytestmark = pytest.mark.platforms("posix")  # the stand-in replaces the native resume
 
 
 def _claims() -> list:

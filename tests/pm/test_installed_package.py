@@ -53,7 +53,7 @@ def test_state_fact_in_shared_facts_file_is_not_a_store_install(pm_env):
     assert composed == env_for("faketool")
 
 
-@pytest.mark.skipif(os.name == "nt", reason="POSIX exec bit")
+@pytest.mark.platforms("posix")  # POSIX exec bit
 def test_entry_staged_without_exec_bit_is_usable_again(pm_env):
     """agent-browser entries staged before stage() set the exec bit raised PermissionError on every launch."""
     ensure("faketool", explicit=True)
