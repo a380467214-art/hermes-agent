@@ -447,16 +447,15 @@ def test_stream_cap_truncates_runaway_upstream(monkeypatch):
 # ── Dispatch: chunked streamer path (regression tests) ───────────────────
 
 
-# The 12 speaker-path tests below assert on the sounddevice OutputStream
+# The 10 speaker-path tests below assert on the sounddevice OutputStream
 # branch, which stream_tts_to_speaker takes on every host EXCEPT macOS —
 # Darwin routes to the tempfile/afplay path by design. They used to fake
 # platform.system() == "Linux" (a no-op on the Linux CI lane) purely to
-# shield macOS dev machines; an honest exclusion skipif says the same
-# thing without lying to the interpreter.
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+# shield macOS dev machines; platforms("not macos") says the same thing
+# without lying to the interpreter, and unlike a bare skipif the OS lanes
+# and scripts/ci/list_os_marked_tests.py can see it. (numpy still gates the
+# module above: it is a lazy voice dependency, absent in hermetic CI.)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_streamer_path_handles_misaligned_pcm_chunks(monkeypatch):
     """Regression: PCM chunks with odd byte counts must not be dropped.
 
@@ -508,10 +507,7 @@ def test_streamer_path_handles_misaligned_pcm_chunks(monkeypatch):
     assert done.is_set()
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_streamer_path_survives_portaudio_write_error(monkeypatch):
     """Regression: a transient PortAudio error on output_stream.write must
     not kill the playback thread or hang the pipeline join.
@@ -548,10 +544,7 @@ def test_streamer_path_survives_portaudio_write_error(monkeypatch):
     assert done.is_set(), "done event must fire even after PortAudio error"
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_streamer_reinit_after_portaudio_error_plays_remaining_sentences(monkeypatch):
     """Regression: after a PortAudio error the worker must reinit the stream
     and continue playing remaining sentences instead of dropping them.
@@ -608,10 +601,7 @@ def test_streamer_reinit_after_portaudio_error_plays_remaining_sentences(monkeyp
     assert done.is_set(), "done event must fire after recovery"
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_streamer_tempfile_fallback_after_reinit_exhausted(monkeypatch):
     """Regression: after 3 failed reinits, remaining sentences must play
     via the temp-file fallback, not be silently dropped.
@@ -676,10 +666,7 @@ def test_streamer_tempfile_fallback_after_reinit_exhausted(monkeypatch):
 
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_speaker_honours_tts_streaming_min_len_for_short_cjk_opener(monkeypatch):
     """The CLI/TUI speaker cuts with the profile's tts.streaming.min_len (#96927): a 7-char CJK
     opener is streamed on its own instead of riding behind the second sentence."""
@@ -713,10 +700,7 @@ def test_speaker_honours_tts_streaming_min_len_for_short_cjk_opener(monkeypatch)
     assert done.is_set()
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_hybrid_subsequent_sentences_prefetched_individually(monkeypatch):
     """Every sentence should get its own stream() call — per-sentence
     prefetch fires the HTTP request the moment each sentence completes,
@@ -768,10 +752,7 @@ def test_hybrid_subsequent_sentences_prefetched_individually(monkeypatch):
 
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_hybrid_done_event_waits_for_prefetch(monkeypatch):
     """The done event must not fire until the prefetch thread has finished,
     otherwise continuous voice mode could overlap turns."""
@@ -820,10 +801,7 @@ def test_hybrid_done_event_waits_for_prefetch(monkeypatch):
     )
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_hybrid_single_sentence_still_works(monkeypatch):
     """A single-sentence reply should stream immediately with no batch."""
     from tools import tts_tool
@@ -857,10 +835,7 @@ def test_hybrid_single_sentence_still_works(monkeypatch):
     assert done.is_set()
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_hybrid_playback_serialized_no_overlap(monkeypatch):
     """Multiple batch flushes must not overlap on the output stream.
 
@@ -1123,10 +1098,7 @@ def test_openai_pcm_sample_rate_resolution(config, headers, expected):
         assert ts.OpenAIStreamer({}, {"api_key": "sk-x", **config}).sample_rate == expected
 
 
-@pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="macOS deliberately skips the sounddevice OutputStream path (PR #62601)",
-)
+@pytest.mark.platforms("not macos")  # macOS deliberately skips the sounddevice OutputStream path (PR #62601)
 def test_speaker_output_stream_opens_at_rate_learned_from_first_chunk(monkeypatch):
     """Issue #76466: the PortAudio device is opened after the first chunk arrived, at the rate
     the provider learned from the response, not at the construction-time default."""
