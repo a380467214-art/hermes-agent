@@ -23,7 +23,6 @@ from __future__ import annotations
 import base64
 import json
 import socket
-import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -42,7 +41,7 @@ from tests.e2e.core.providers._openai_helpers import (
 )
 from tests.fakes.providers.openai_responses import FakeResponsesServer, Message, Turn
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="subprocess harness is Linux-gated")
+pytestmark = pytest.mark.platforms("linux")  # subprocess harness is Linux-gated
 
 KNOWN: dict[str, tuple[str, str]] = {
     "independent_login_survives": (

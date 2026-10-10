@@ -10,7 +10,6 @@ cadence/count the fake observed and what the user and state.db end up with.
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 import pytest
@@ -20,7 +19,7 @@ from tests.e2e.core.providers._anthropic_helpers import Rig, dump, normalised, s
 from tests.fakes.providers.anthropic_messages import ApiError, DropStream, Reply, Text, Thinking
 import itertools
 
-pytestmark = [pytest.mark.skipif(not sys.platform.startswith("linux"), reason="process-tree cleanup uses /proc"),
+pytestmark = [pytest.mark.platforms("linux"),  # process-tree cleanup uses /proc
               pytest.mark.live_system_guard_bypass]
 
 

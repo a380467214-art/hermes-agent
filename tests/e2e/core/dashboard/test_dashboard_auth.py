@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import json
 import re
-import sys
 from pathlib import Path
 
 import pytest
@@ -33,7 +32,7 @@ from websockets.sync.client import connect
 
 from . import _helpers as H
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX PTY dashboard")
+pytestmark = pytest.mark.platforms("linux")  # POSIX PTY dashboard
 
 _INVENTORY = r"""
 import json

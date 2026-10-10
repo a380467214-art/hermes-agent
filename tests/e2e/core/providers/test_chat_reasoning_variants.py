@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import json
-import sys
 
 import pytest
 
@@ -32,7 +31,7 @@ from tests.e2e.core.providers._openai_helpers import (
 from tests.e2e.core.providers._openai_tui import TuiGateway
 from tests.fakes.providers.chat_variants import CText, CTools, FakeChatVariantServer
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="subprocess harness is Linux-gated")
+pytestmark = pytest.mark.platforms("linux")  # subprocess harness is Linux-gated
 
 
 def _rd(tag: str, text: str | None = None) -> list[dict]:

@@ -17,7 +17,6 @@
 
 from __future__ import annotations
 
-import sys
 
 import pytest
 
@@ -35,7 +34,7 @@ from tests.e2e.core.providers._openai_helpers import (
 )
 from tests.fakes.providers.chat_variants import CDropToolCall, CText, CTools, FakeChatVariantServer
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="subprocess harness is Linux-gated")
+pytestmark = pytest.mark.platforms("linux")  # subprocess harness is Linux-gated
 
 STRICT_TURN_BUDGET = 60.0
 

@@ -21,7 +21,6 @@ token and the login is lost.
 
 from __future__ import annotations
 
-import sys
 import threading
 import time
 import uuid
@@ -40,7 +39,7 @@ from tests.e2e.core.providers._oauth_helpers import (
     wait_until,
 )
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="tagged-tree cleanup uses /proc")
+pytestmark = pytest.mark.platforms("linux")  # tagged-tree cleanup uses /proc
 
 FINAL = "OAUTH-REFRESH-TURN-COMPLETE"
 SLOW_TOKEN_ENDPOINT_S = 2.0

@@ -147,13 +147,13 @@ def test_a_background_hook_never_keeps_a_completed_update_locked(repo, tmp_path)
             os.kill(int(pid_file.read_text(encoding="utf-8")), signal.SIGKILL)  # windows-footgun: ok - POSIX-only test
 
 
-@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="parent-death signal is Linux-only")
+@pytest.mark.platforms("linux")  # parent-death signal is Linux-only
 def test_network_git_dies_with_its_killed_owner(repo, tmp_path):
     """The fd-less fetch must not keep rewriting refs after the owner died (the next owner's lease)."""
     _assert_fetch_dies_with_killed_owner(repo, tmp_path, "")
 
 
-@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="reads the fetch's pid from /proc")
+@pytest.mark.platforms("linux")  # reads the fetch's pid from /proc
 def test_network_git_dies_with_its_killed_owner_without_a_parent_death_signal(repo, tmp_path):
     """R3: where there is no parent-death signal (macOS), the fetch must still die with its owner."""
     _assert_fetch_dies_with_killed_owner(
@@ -454,7 +454,7 @@ def _launch_in_custody(repo: Path, tmp_path: Path, command: list[str], *, platfo
         lock.release()
 
 
-@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX process groups + /proc")
+@pytest.mark.platforms("linux")  # POSIX process groups + /proc
 def test_a_group_kill_of_the_caller_stops_the_whole_build(repo, tmp_path):
     """L1: the completion child's Ctrl-C path ``killpg``s its own group and Desktop kills the
     backend's group; the build (node and what it starts) must be inside that group. A build
@@ -473,7 +473,7 @@ def test_a_group_kill_of_the_caller_stops_the_whole_build(repo, tmp_path):
     assert not late_child.exists(), "a build descendant survived a group kill of its caller"
 
 
-@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX sessions + /proc")
+@pytest.mark.platforms("linux")  # POSIX sessions + /proc
 @pytest.mark.live_system_guard_bypass  # the caller's group kill is the scenario under test
 def test_a_group_kill_of_the_caller_keeps_custody_until_a_detached_writer_is_gone(repo, tmp_path):
     """E: the completion child ``killpg``s its own group on interruption; the launcher holding
@@ -519,7 +519,7 @@ def test_a_group_kill_of_the_caller_keeps_custody_until_a_detached_writer_is_gon
             os.kill(int(beat.read_text(encoding="utf-8").split()[0]), signal.SIGKILL)  # windows-footgun: ok - Linux-only test
 
 
-@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX sessions + /proc")
+@pytest.mark.platforms("linux")  # POSIX sessions + /proc
 @pytest.mark.live_system_guard_bypass  # Ctrl-C of the caller's own group is the scenario under test
 @pytest.mark.parametrize(("verbose", "cleanup"), [("1", 2), ("0", 0)], ids=["verbose-slow-cleanup", "captured-instant-exit"])
 def test_a_ctrl_c_keeps_custody_until_a_detached_writer_is_gone(repo, tmp_path, verbose, cleanup):
@@ -574,7 +574,7 @@ def test_a_ctrl_c_keeps_custody_until_a_detached_writer_is_gone(repo, tmp_path, 
             os.kill(int(beat.read_text(encoding="utf-8").split()[0]), signal.SIGKILL)  # windows-footgun: ok - Linux-only test
 
 
-@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX sessions + /proc")
+@pytest.mark.platforms("linux")  # POSIX sessions + /proc
 @pytest.mark.parametrize("platform", [None, "darwin"], ids=["subreaper", "ps-walk"])
 def test_a_detached_grandchild_outliving_node_dies_before_the_build_returns(repo, tmp_path, platform):
     """N13/L1: a descendant that left node's process group (its own session) and outlives node
@@ -588,7 +588,7 @@ def test_a_detached_grandchild_outliving_node_dies_before_the_build_returns(repo
     assert not late.exists(), "a detached build descendant kept writing after the build call returned"
 
 
-@pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX signals + /proc")
+@pytest.mark.platforms("linux")  # POSIX signals + /proc
 def test_a_terminated_launcher_takes_node_and_its_descendants_with_it(repo, tmp_path):
     """L1: SIGTERM to the launcher (a service manager, the caller's polite stop) is forwarded to
     node, and what node started is killed too, before the launcher exits."""

@@ -14,7 +14,6 @@ fresh TUI processes reopen it from the same state.db.
 from __future__ import annotations
 
 import re
-import sys
 import time
 from collections import Counter
 
@@ -26,7 +25,7 @@ from tests.e2e.core.tui_pty._helpers import (
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="tmux + /proc session scan"),
+    pytest.mark.platforms("linux"),  # tmux + /proc session scan
     pytest.mark.live_system_guard_bypass,
 ]
 

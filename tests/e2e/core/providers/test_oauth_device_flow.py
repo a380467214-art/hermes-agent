@@ -7,7 +7,6 @@ recorded SERVER-side, so the gaps are what the vendor would observe.
 
 from __future__ import annotations
 
-import sys
 import time
 from dataclasses import dataclass
 
@@ -17,7 +16,7 @@ from tests.e2e.core._pending_fixes import known_gate
 from tests.e2e.core.providers._oauth_helpers import kill_tagged, make_home, run_hermes
 from tests.fakes.providers.oauth_token_server import OAuthTokenServer, unsigned_jwt
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="tagged-tree cleanup uses /proc")
+pytestmark = pytest.mark.platforms("linux")  # tagged-tree cleanup uses /proc
 
 PENDING, SLOW_DOWN, APPROVE = "authorization_pending", "slow_down", "approve"
 # Scheduler/request latency only ever makes a gap LONGER; this absorbs clock granularity.

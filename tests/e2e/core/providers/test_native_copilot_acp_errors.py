@@ -43,7 +43,7 @@ from tests.fakes.providers import copilot_acp as acp
 pytest.importorskip("acp.schema", reason="the fake validates against the agent-client-protocol package (acp extra)")
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX launcher script + /proc pid checks"),
+    pytest.mark.platforms("linux"),  # POSIX launcher script + /proc pid checks
     pytest.mark.live_system_guard_bypass,
 ]
 

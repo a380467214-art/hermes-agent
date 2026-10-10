@@ -34,7 +34,7 @@ from tests.fakes.providers.anthropic_messages import Reply, Text, Thinking, Tool
 
 # The guard bypass is only for teardown: a daemonised helper the gateway spawns can be reparented
 # to init, and kill_tagged() signals nothing but PIDs carrying this test's unique tag.
-pytestmark = [pytest.mark.skipif(not sys.platform.startswith("linux"), reason="process-tree cleanup uses /proc"),
+pytestmark = [pytest.mark.platforms("linux"),  # process-tree cleanup uses /proc
               pytest.mark.live_system_guard_bypass]
 
 # Signatures are opaque base64 blobs on the real API; include every base64 symbol plus

@@ -21,7 +21,6 @@ result, and the request stream the fake provider recorded — never from log wor
 from __future__ import annotations
 
 import json
-import sys
 import threading
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -34,7 +33,7 @@ from tests.e2e.core.kanban._helpers import Board
 from tests.fakes.fake_llm_provider import Error, FakeLLMServer, Text, ToolCall
 
 pytestmark = [
-    pytest.mark.skipif(sys.platform != "linux", reason="worker liveness reads /proc"),
+    pytest.mark.platforms("linux"),  # worker liveness reads /proc
     # Teardown SIGKILLs the dispatcher-spawned workers (our grandchildren, outside the pytest subtree).
     pytest.mark.live_system_guard_bypass,
 ]

@@ -35,7 +35,6 @@ import contextlib
 import os
 import random
 import sqlite3
-import sys
 import time
 
 import pytest
@@ -59,7 +58,7 @@ from tests.e2e.core.sqlite._helpers import (
 )
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="/proc fd scan and POSIX lock semantics"),
+    pytest.mark.platforms("linux"),  # /proc fd scan and POSIX lock semantics
 ]
 
 READER_FD_SLACK = 6

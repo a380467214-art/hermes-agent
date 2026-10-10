@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import os
 import shutil
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -36,7 +35,7 @@ from tests.e2e.core.terminal._pty import REPO_ROOT, PtyHermes, canon
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text, ToolCall
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="real PTY + /proc session scan"),
+    pytest.mark.platforms("linux"),  # real PTY + /proc session scan
     # Cleanup SIGKILLs only processes whose session id is the PTY child this test spawned; a
     # grandchild reparented to init after its parent died is outside the pid subtree but still ours.
     pytest.mark.live_system_guard_bypass,

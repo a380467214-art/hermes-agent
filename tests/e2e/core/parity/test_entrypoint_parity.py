@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -57,7 +56,7 @@ from tests.e2e.core.parity._helpers import (
 # PIDs carrying this run's unique PARITY_TREE_TAG. Children run with a tmp
 # HOME/HERMES_HOME (asserted in ParityHome.env), so no real state is reachable.
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="process-tree checks use /proc"),
+    pytest.mark.platforms("linux"),  # process-tree checks use /proc
     pytest.mark.live_system_guard_bypass,
 ]
 

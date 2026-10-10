@@ -55,7 +55,7 @@ from tests.e2e.core.parity._helpers import hermes_argv
 from tests.e2e.core._pending_fixes import known_gate
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="process-tree cleanup uses /proc"),
+    pytest.mark.platforms("linux"),  # process-tree cleanup uses /proc
     pytest.mark.live_system_guard_bypass,  # teardown SIGKILLs only processes carrying this test's tag
 ]
 

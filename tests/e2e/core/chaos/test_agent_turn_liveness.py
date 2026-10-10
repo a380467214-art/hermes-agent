@@ -29,7 +29,6 @@ import json
 import queue
 import re
 import subprocess
-import sys
 import threading
 import time
 import uuid
@@ -74,7 +73,7 @@ from tests.fakes.fake_llm_provider import (
     ToolCall,
 )
 
-pytestmark = [pytest.mark.skipif(sys.platform != "linux", reason="orphan scan reads /proc")]
+pytestmark = [pytest.mark.platforms("linux")]  # orphan scan reads /proc
 
 BOOT_DEADLINE_S = 120.0  # cold import of the agent stack on a loaded runner
 PROBE_DEADLINE_S = 60.0

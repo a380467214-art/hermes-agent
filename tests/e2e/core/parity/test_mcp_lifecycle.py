@@ -23,7 +23,6 @@ from __future__ import annotations
 import contextlib
 import os
 import signal
-import sys
 import time
 import uuid
 from pathlib import Path
@@ -47,7 +46,7 @@ from tests.e2e.core.parity._helpers import (
 # Same rationale as test_entrypoint_parity: Linux /proc scans, and the bypass is
 # for teardown of reparented orphans carrying this run's unique tag only.
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="process-tree checks use /proc"),
+    pytest.mark.platforms("linux"),  # process-tree checks use /proc
     pytest.mark.live_system_guard_bypass,
 ]
 

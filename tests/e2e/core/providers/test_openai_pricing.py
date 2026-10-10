@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import json
 import socket
-import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -42,7 +41,7 @@ from tests.e2e.core.providers._openai_helpers import (
 )
 from tests.e2e.core.providers._openai_tui import TuiGateway
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="subprocess harness is Linux-gated")
+pytestmark = pytest.mark.platforms("linux")  # subprocess harness is Linux-gated
 
 KNOWN: dict[str, tuple[str, str]] = {
     "custom_twin_priced": (

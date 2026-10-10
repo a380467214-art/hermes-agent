@@ -13,7 +13,6 @@ next reply renders exactly once after it.
 from __future__ import annotations
 
 import re
-import sys
 
 import pytest
 
@@ -24,7 +23,7 @@ from tests.e2e.core.tui_pty._helpers import (
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="tmux + /proc session scan"),
+    pytest.mark.platforms("linux"),  # tmux + /proc session scan
     pytest.mark.live_system_guard_bypass,
 ]
 

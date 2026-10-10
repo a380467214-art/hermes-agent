@@ -58,7 +58,7 @@ from tests.e2e.core.upgrade._helpers import (
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text, write_hermes_home
 
 pytestmark = [
-    pytest.mark.skipif(sys.platform != "linux", reason="fork()-based import isolation and bwrap sandbox are Linux-only"),
+    pytest.mark.platforms("linux"),  # fork()-based import isolation and bwrap sandbox are Linux-only
 ]
 
 PY = sys.executable

@@ -18,7 +18,6 @@ Proven here:
 from __future__ import annotations
 
 import json
-import sys
 
 import pytest
 
@@ -40,7 +39,7 @@ from tests.fakes.providers.chat_variants import (
     FakeChatVariantServer,
 )
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="subprocess harness is Linux-gated")
+pytestmark = pytest.mark.platforms("linux")  # subprocess harness is Linux-gated
 
 # Scenario -> (pattern, "#issue one-line symptom") for scenarios red on origin/main: a
 # KnownBugError from bug_assertions() matching the pattern XFAILs the cell (known_gate).

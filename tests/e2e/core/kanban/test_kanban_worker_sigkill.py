@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import os
 import signal
-import sys
 import threading
 import time
 from dataclasses import dataclass, field
@@ -29,7 +28,7 @@ from tests.e2e.core.kanban._helpers import Board, pid_alive, wait_until
 from tests.fakes.fake_llm_provider import FakeLLMServer, Hang, Text, ToolCall
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="SIGKILL + /proc liveness"),
+    pytest.mark.platforms("linux"),  # SIGKILL + /proc liveness
     # Workers are grandchildren (spawned by the dispatcher child, then reparented); the only
     # signals sent are SIGKILLs to PIDs this module read from its own scratch board.
     pytest.mark.live_system_guard_bypass,

@@ -26,7 +26,7 @@ import pytest
 from . import _helpers as H
 import itertools
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX dashboard process")
+pytestmark = pytest.mark.platforms("linux")  # POSIX dashboard process
 
 SEEDED = 40
 WRITE_SECONDS = 8.0

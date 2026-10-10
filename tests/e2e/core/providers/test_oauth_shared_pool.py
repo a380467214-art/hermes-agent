@@ -16,7 +16,6 @@ is pinned by test_oauth_anthropic_refresh.py.
 
 from __future__ import annotations
 
-import sys
 import threading
 
 import pytest
@@ -32,7 +31,7 @@ from tests.e2e.core.providers._oauth_helpers import (
     wait_until,
 )
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="tagged-tree cleanup uses /proc")
+pytestmark = pytest.mark.platforms("linux")  # tagged-tree cleanup uses /proc
 
 SLOW_TOKEN_ENDPOINT_S = 2.0  # vendor latency window while both processes contend, not synchronization
 

@@ -33,7 +33,6 @@ import json
 import random
 import re
 import sqlite3
-import sys
 import threading
 import time
 from dataclasses import dataclass
@@ -59,7 +58,7 @@ from tests.e2e.core.sqlite._helpers import (
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text, ToolCall, write_hermes_home
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="/proc fd scan and POSIX lock semantics"),
+    pytest.mark.platforms("linux"),  # /proc fd scan and POSIX lock semantics
 ]
 
 Q_TOKEN = re.compile(r"TA[a-z]+\d+N\d+Q")

@@ -30,7 +30,6 @@ from __future__ import annotations
 import json
 import re
 import sqlite3
-import sys
 import time
 import uuid
 from concurrent.futures import Future, ThreadPoolExecutor
@@ -70,7 +69,7 @@ from tests.fakes.fake_llm_provider import (
 )
 
 pytestmark = [
-    pytest.mark.skipif(sys.platform != "linux", reason="orphan scan reads /proc; POSIX gateway signals"),
+    pytest.mark.platforms("linux"),  # orphan scan reads /proc; POSIX gateway signals
 ]
 
 # The adapter ticks every 100 ms on the gateway loop. Healthy gaps are ~0.11 s, worst seen

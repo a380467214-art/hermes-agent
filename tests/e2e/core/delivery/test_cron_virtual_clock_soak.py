@@ -32,7 +32,6 @@ import bisect
 import dataclasses
 import math
 import os
-import sys
 import threading
 import time
 from datetime import date, datetime, timedelta, timezone, UTC
@@ -47,8 +46,7 @@ croniter_mod = pytest.importorskip("croniter")
 from tests.e2e.core.delivery import _cron_clock as H
 from tests.e2e.core.delivery._pending_fixes import gap_open
 
-pytestmark = pytest.mark.skipif(
-    sys.platform != "linux", reason="flock/SIGKILL multi-process soak is Linux-only")
+pytestmark = pytest.mark.platforms("linux")  # flock/SIGKILL multi-process soak is Linux-only
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 GRID_SECONDS = 6 * 3600  # sparse idle ticks; due/pre-due ticks are added per occurrence

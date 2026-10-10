@@ -14,7 +14,6 @@ from __future__ import annotations
 import json
 import re
 import shutil
-import sys
 from pathlib import Path
 
 import pytest
@@ -24,7 +23,7 @@ from tests.e2e.core.kanban._helpers import Board, wait_until
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text, ToolCall
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="/proc worker liveness"),
+    pytest.mark.platforms("linux"),  # /proc worker liveness
     pytest.mark.live_system_guard_bypass,  # teardown SIGKILLs this board's reparented workers
 ]
 

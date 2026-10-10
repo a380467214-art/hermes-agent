@@ -23,7 +23,6 @@ from __future__ import annotations
 import re
 import signal
 import subprocess
-import sys
 import threading
 import time
 from collections import Counter
@@ -34,7 +33,7 @@ from tests.e2e.core.kanban._helpers import PY, Board, pid_alive, wait_until
 from tests.fakes.fake_llm_provider import FakeLLMServer, Text, ToolCall
 
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="SIGKILL + /proc liveness"),
+    pytest.mark.platforms("linux"),  # SIGKILL + /proc liveness
     pytest.mark.live_system_guard_bypass,  # teardown SIGKILLs this board's reparented workers
 ]
 

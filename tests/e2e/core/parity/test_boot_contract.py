@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import contextlib
 import json
-import sys
 import time
 import urllib.request
 from pathlib import Path
@@ -45,7 +44,7 @@ from tests.e2e.core.parity._helpers import build_parity_home, kill_tagged, start
 # PIDs carrying this run's unique PARITY_TREE_TAG. Children run with a tmp
 # HOME/HERMES_HOME (asserted in ParityHome.env), so no real state is reachable.
 pytestmark = [
-    pytest.mark.skipif(not sys.platform.startswith("linux"), reason="process-tree cleanup uses /proc"),
+    pytest.mark.platforms("linux"),  # process-tree cleanup uses /proc
     pytest.mark.live_system_guard_bypass,
 ]
 

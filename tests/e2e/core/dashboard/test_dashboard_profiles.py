@@ -17,7 +17,6 @@ materialised into the user's sparse YAML.
 from __future__ import annotations
 
 import json
-import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -27,7 +26,7 @@ import hermes_yaml as yaml
 
 from . import _helpers as H
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX dashboard process")
+pytestmark = pytest.mark.platforms("linux")  # POSIX dashboard process
 
 NAMES = ("default", "alpha", "beta")
 WALK = ("alpha", "beta", "alpha", "default", "beta")

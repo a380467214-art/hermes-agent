@@ -29,7 +29,6 @@ import re
 import secrets
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +40,7 @@ from tests.fakes.fake_llm_provider import Text
 from . import _helpers as H
 from ._pty_helpers import ProcessLedger, WsTerm, canon, poll
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="POSIX PTY dashboard")
+pytestmark = pytest.mark.platforms("linux")  # POSIX PTY dashboard
 
 _CANARY = re.compile(r"canary-[0-9a-f]{12}")
 ROWS, COLS = 40, 120

@@ -14,7 +14,6 @@ Controls (enforced, separate test): a 60,000-char message through the same ``/ch
 from __future__ import annotations
 
 import secrets
-import sys
 import time
 from pathlib import Path
 from typing import Any, Iterator
@@ -25,7 +24,7 @@ from tests.e2e.core.dashboard._helpers import Sandbox, make_sandbox
 from tests.e2e.core._pending_fixes import known_gate
 from tests.e2e.core.dashboard._issue_helpers import GatewayApiServer, Issue120937
 
-pytestmark = pytest.mark.skipif(not sys.platform.startswith("linux"), reason="reaper reads /proc")
+pytestmark = pytest.mark.platforms("linux")  # reaper reads /proc
 TURN_TIMEOUT = 90.0
 
 # test name -> (the bug's own failure signature, "#issue reason"); see _pending_fixes.known_failure.
