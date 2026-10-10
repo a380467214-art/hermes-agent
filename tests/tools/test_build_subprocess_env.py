@@ -77,3 +77,34 @@ def test_e2e_scrubbed_env_resolves_bare_hermes_under_minimal_parent_path(monkeyp
     # duplicate the entry.
     env2 = build_subprocess_env(env, scrub_secrets=True)
     assert env2["PATH"].split(os.pathsep).count(bin_dir) == 1
+
+
+@pytest.mark.usefixtures("child_env")
+def test_factory_pins_the_running_checkouts_bundled_skills_tree():
+    """A child that resolves ANOTHER checkout's ``hermes`` (PATH fallback, a stale launcher shim)
+    must still sync the tree its parent runs from: the factory exports this process's own bundled
+    skills dir, so a ``hermes update`` / chat boot in that child cannot replace the user's live
+    skills with the other checkout's copies. Same caliber as
+    ``tools/skills_sync.py::_get_bundled_dir()``.
+    """
+    from pathlib import Path
+
+    from hermes_constants import get_bundled_skills_dir
+    from tools.environments import local as local_mod
+
+    expected = str(get_bundled_skills_dir(Path(local_mod.__file__).resolve().parents[2] / "skills"))
+    env = build_subprocess_env(scrub_secrets=True)
+    assert env.get("HERMES_BUNDLED_SKILLS") == expected
+    assert expected  # never pin an empty value
+
+    # Non-terminal children share the same tail.
+    from tools.environments.local import hermes_subprocess_env
+    assert hermes_subprocess_env()["HERMES_BUNDLED_SKILLS"] == expected
+
+
+@pytest.mark.usefixtures("child_env")
+def test_factory_leaves_an_explicit_bundled_skills_tree_alone(monkeypatch):
+    """Nix/Homebrew wrappers and operators set ``HERMES_BUNDLED_SKILLS`` explicitly; the factory
+    uses ``setdefault``, so that declared tree keeps precedence."""
+    monkeypatch.setenv("HERMES_BUNDLED_SKILLS", "/custom/bundled-skills")
+    assert build_subprocess_env(scrub_secrets=True)["HERMES_BUNDLED_SKILLS"] == "/custom/bundled-skills"

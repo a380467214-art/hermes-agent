@@ -16,7 +16,7 @@ import time
 from collections.abc import Mapping
 from pathlib import Path
 
-from hermes_constants import get_process_hermes_home
+from hermes_constants import get_bundled_skills_dir, get_process_hermes_home
 from tools.environments.base import BaseEnvironment
 from tools.environments.base_output import _pipe_stdin
 from hermes_cli._subprocess_compat import windows_hide_flags
@@ -275,12 +275,18 @@ def _filter_secret_env(
 
 def _finalize_child_env(env: dict) -> dict:
     """Guards shared by every spawn surface: profile-home propagation, session-context
-    bridging, Hermes-owned PYTHONPATH + venv-marker strip, MSYS defaults, delegate_task
-    Kanban scrub. Returns the (possibly new) dict."""
+    bridging, Hermes-owned PYTHONPATH + venv-marker strip, MSYS defaults, bundled-skill
+    tree pin, delegate_task Kanban scrub. Returns the (possibly new) dict."""
     _apply_profile_home(env)
     _inject_session_context_env(env)
     _strip_hermes_owned_pythonpath_and_runtime_markers(env)
     _apply_windows_msys_bash_env_defaults(env)
+    # Pin the bundled-skill tree THIS process runs from, so a child that resolves a different
+    # checkout's ``hermes`` (PATH fallback, a stale launcher shim) still syncs the parent's tree
+    # instead of replacing the user's live skills with that other checkout's copies. ``setdefault``
+    # keeps an explicit HERMES_BUNDLED_SKILLS (Nix/Homebrew wrapper, operator override) authoritative.
+    env.setdefault("HERMES_BUNDLED_SKILLS",
+                   str(get_bundled_skills_dir(Path(__file__).resolve().parents[2] / "skills")))
     from agent.delegation_context import delegated_child_subprocess_env
     return delegated_child_subprocess_env(env)
 
