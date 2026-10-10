@@ -10,7 +10,7 @@ Drives the real ``--self-test-gate`` entry point of ``posix.sh`` (the same one
 ``scripts/desktop-update/repro.sh gate`` uses). On macOS, where BSD readlink
 lacks ``-m``, a PATH shim provides a GNU-compatible ``readlink`` so the gate
 logic itself is exercised everywhere (the canonicalisation behaviour is
-already covered by the linux_only matrix in test_desktop_update_linux_gate.py).
+already covered by the linux matrix in test_desktop_update_linux_gate.py).
 """
 from __future__ import annotations
 
@@ -20,13 +20,23 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 POSIX_SH = Path(__file__).resolve().parent.parent.parent.parent / "scripts" / "desktop-update" / "posix.sh"
 
 # NOT linux_only: unlike the symlink-matrix file, these cases only exercise
 # the gate's dir-selection logic (the relaunch/skew paths return before the
 # GNU-only `stat -c` sandbox probe), so a PATH shim for `readlink -m` on
-# BSD-readlink hosts is enough to run the real posix.sh everywhere. On Linux
-# the system readlink is used as-is.
+# BSD-readlink hosts is enough to run the real posix.sh on any POSIX host. On
+# Linux the system readlink is used as-is.
+#
+# platforms("posix") is what makes that reach real: without a marker no OS lane
+# imports this file, so the macOS arm (the whole point of the shim) never ran
+# anywhere. The host set stops at POSIX on purpose -- posix.sh is the POSIX
+# desktop-update path (native Windows runs windows.ps1), and the `bash` a
+# Windows test process finds is either the WSL stub or MSYS, not the shell this
+# gate is written for.
+pytestmark = pytest.mark.platforms("posix")
 
 
 def _readlink_shim_dir(tmp_path: Path) -> Path:

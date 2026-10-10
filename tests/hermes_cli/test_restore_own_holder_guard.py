@@ -37,9 +37,15 @@ def _read_marker(path):
 
 
 def _own_deleted_fds(needle):
-    """Paths of this process's fds pointing at deleted files matching needle."""
+    """Paths of this process's fds pointing at deleted files matching needle.
+
+    Linux-only: the scan reads ``/proc/<pid>/fd``. The two tests that call it
+    carry ``platforms("linux")``; skipping instead of returning [] keeps a
+    dropped gate visible rather than turning the ghost check into a vacuous
+    "no deleted fds" pass.
+    """
     if not sys.platform.startswith("linux"):
-        return []
+        pytest.skip("deleted-fd scan reads /proc/<pid>/fd; Linux-only")
     out = []
     fd_dir = f"/proc/{os.getpid()}/fd"
     for fd in os.listdir(fd_dir):
@@ -79,6 +85,7 @@ def live_held_db(tmp_path):
             pass
 
 
+@pytest.mark.platforms("linux")  # _own_deleted_fds reads /proc/<pid>/fd
 def test_safe_restore_fallback_refuses_under_own_live_connection(live_held_db):
     src, dst = live_held_db
     wal = dst.with_name(dst.name + "-wal")
@@ -91,6 +98,7 @@ def test_safe_restore_fallback_refuses_under_own_live_connection(live_held_db):
     assert _own_deleted_fds(str(dst.name)) == []
 
 
+@pytest.mark.platforms("linux")  # _own_deleted_fds reads /proc/<pid>/fd
 def test_update_autorestore_refuses_under_own_live_connection(
     live_held_db, capsys
 ):
